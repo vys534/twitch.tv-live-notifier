@@ -1,0 +1,25 @@
+{
+  "name": "streamer-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/humanize-duration": "^3.18.0",
+    "@types/node": "^13.9.5",
+    "@types/ws": "^7.2.3",
+    "axios": "^0.21.1",
+    "discord.js": "github:discordjs/discord.js",
+    "envalid": "^6.0.1",
+    "humanize-duration": "^3.22.0",
+    "moment": "^2.24.0",
+    "npm": "^7.6.3"
+  },
+  "devDependencies": {
+    "typescript": "^4.2.3"
+  }
+}
