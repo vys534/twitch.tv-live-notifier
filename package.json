@@ -15,6 +15,7 @@
     "@types/ws": "^7.4.4",
     "axios": "^0.21.1",
     "discord.js": "github:discordjs/discord.js",
+    "dotenv": "^10.0.0",
     "envalid": "^7.1.0",
     "humanize-duration": "^3.27.0",
     "moment": "^2.29.1"

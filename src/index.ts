@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 import {Client, Message, MessageEmbedOptions, TextChannel} from "discord.js";
 import axios, {AxiosError, AxiosResponse} from "axios";
 import * as envalid from "envalid";
