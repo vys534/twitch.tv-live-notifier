@@ -4,8 +4,6 @@ Display streaming notifications from Twitch right in your Discord server. Live a
 
 ## Setup & Run
 
-You need basic knowledge of how to use the GNU/Linux command line and already have a VPS set up and running. **If you are the streamer, and you don't know how to use a VPS/command line, try finding someone who can set this up for you or learn how to set up a VPS.**
-
 ### Step 0: clone the repo and setup
 
 - On your VPS, run the usual `git clone` of this repository. Then, `cd` into the directory.
@@ -25,7 +23,6 @@ TWITCH_USERNAME=
 TWITCH_CID=
 TWITCH_SECRET=
 SERVER_ID=
-WELCOME_CHANNEL_ID=
 STREAMING_CHANNEL_ID=
 PING_ROLE=
 ```
@@ -36,7 +33,6 @@ PING_ROLE=
 - `TWITCH_SECRET` is your Twitch application's client secret. **Do not share this with anyone.**
 - `SERVER_ID` is the Discord server's ID. Not a channel ID, the entire server.
     - ![](https://i.postimg.cc/50mv6Nzk/image.png)
-- `WELCOME_CHANNEL_ID`: Send all welcome messages to this channel ID.
 - `STREAMING_CHANNEL_ID`: Send all stream messages to this channel ID.
 - `PING_ROLE`: The role ID to ping when you go live. To ping everyone, **use the value`everyone`**.
 
@@ -44,11 +40,4 @@ PING_ROLE=
 
 Now you have to build the project.
 
-- Run `tsc` from the terminal. It will automatically build the index.js file into a `dist` directory. Don't worry, it will be created if it isn't there. Now, depending on your computer's specs, it will take a few seconds. It should never take more than a minute. 
-- Okay, now you have a built `index.js` file that's ready to deploy. Next step: install `pm2` if you don't have it. **If you do, skip down to the last bullet point.**
-- Install PM2 by running `npm i -g pm2`. 
-- Run `pm2 start dist/index.js --name TwitchBot` **FROM THE ROOT DIRECTORY! DO NOT CD INTO /dist.** Your bot should now be running. Check `pm2 logs TwitchBot` after you do this to make sure there are no errors.
-
-## Updating
-
-To update the bot to the latest version, just run `git pull`.
+Run `tsc` from the terminal. It will automatically build the index.js file into a `dist` directory. How you want to run the bot is up to you; just remember to start `dist/index.js`.

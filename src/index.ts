@@ -1,8 +1,12 @@
 import {Client, Message, MessageEmbedOptions, TextChannel} from "discord.js";
 import axios, {AxiosError, AxiosResponse} from "axios";
 import * as envalid from "envalid";
-import * as hd from "humanize-duration"
-import * as m from "moment";
+import hd from "humanize-duration";
+import m from "moment";
+
+const bigIntParse = envalid.makeValidator(x => {
+    return <bigint><unknown>x;
+})
 
 interface StreamData {
     isStreaming: boolean
@@ -32,8 +36,7 @@ interface Config {
     TWITCH_USERNAME: string
     TWITCH_CID: string
     SERVER_ID: string
-    WELCOME_CHANNEL_ID: string
-    STREAMING_CHANNEL_ID: string
+    STREAMING_CHANNEL_ID: bigint
     TWITCH_SECRET: string
     PING_ROLE: string
 }
@@ -87,8 +90,7 @@ class Application {
         TWITCH_CID: envalid.str(),
         TWITCH_SECRET: envalid.str(),
         SERVER_ID: envalid.str(),
-        WELCOME_CHANNEL_ID: envalid.str(),
-        STREAMING_CHANNEL_ID: envalid.str(),
+        STREAMING_CHANNEL_ID: bigIntParse(),
         PING_ROLE: envalid.str()
     });
     private oAuthToken: string;
@@ -224,7 +226,12 @@ class Application {
                 // Assume stream ended.
                 if (this.streamData.isStreaming) {
                     console.log("DEBUG - Stream ended. Cleaning up message...");
-                    await this.streamData.streamMessage.edit(`:no_entry_sign: ${this.streamData.username} has ended the stream. Tune in next time!`, this.buildStreamEmbed(true));
+                    await this.streamData.streamMessage.edit({
+                        content: `:no_entry_sign: ${this.streamData.username} has ended the stream. Tune in next time!`,
+                        embeds: [
+                            this.buildStreamEmbed(true)
+                        ]
+                    });
                     // Reset all stream data AFTER editing the message.
                     this.streamData = Application.setStreamDataDefault();
                     console.log("DEBUG - Successfully cleaned up.");
@@ -238,7 +245,12 @@ class Application {
                 await this.updateStatistics(twitchData);
                 // Just update the message because they're still streaming
                 if (this.streamData.isStreaming) {
-                    await this.streamData.streamMessage.edit(`:red_circle: ${this.streamData.username} is currently streaming${this.streamData.playing ? ` **${this.streamData.playing}**` : ""}!`, this.buildStreamEmbed(false))
+                    await this.streamData.streamMessage.edit({
+                        content: `:red_circle: ${this.streamData.username} is currently streaming${this.streamData.playing ? ` **${this.streamData.playing}**` : ""}!`,
+                        embeds: [
+                            this.buildStreamEmbed(false)
+                        ]
+                    })
                 }
                 // We can assume that we've just gotten the signal that this user has started streaming.
                 else {
@@ -247,8 +259,13 @@ class Application {
                     this.streamData.isStreaming = true;
 
                     // Build and set message
-                    const channelToSend = await this.client.channels.cache.get(this.config.STREAMING_CHANNEL_ID) as TextChannel;
-                    this.streamData.streamMessage = await channelToSend.send(`:red_circle: ${this.config.PING_ROLE == "everyone" || this.config.PING_ROLE == "here" ? `@${this.config.PING_ROLE}` : `<@${this.config.PING_ROLE}>`}, ${this.streamData.username} is now live!${this.streamData.playing ? ` Playing: **${this.streamData.playing}**` : ""}`, this.buildStreamEmbed(false));
+                    const channelToSend = this.client.channels.cache.get(`${this.config.STREAMING_CHANNEL_ID}`) as TextChannel;
+                    this.streamData.streamMessage = await channelToSend.send({
+                        content: `:red_circle: ${this.config.PING_ROLE == "everyone" || this.config.PING_ROLE == "here" ? `@${this.config.PING_ROLE}` : `<@${this.config.PING_ROLE}>`}, ${this.streamData.username} is now live!${this.streamData.playing ? ` Playing: **${this.streamData.playing}**` : ""}`,
+                        embeds: [
+                            this.buildStreamEmbed(false)
+                        ]
+                    });
                     console.log("DISCORD - Stream message sent successfully.");
                 }
             }
@@ -272,7 +289,7 @@ class Application {
             // await this.updateUserData();
 
             // console.log(`Tracking Twitch user ${this.userData.loginName}.\nDisplay name: ${this.userData.displayName}\nWelcome channel ID: ${this.config.WELCOME_CHANNEL_ID}\nStreaming channel ID: ${this.config.STREAMING_CHANNEL_ID}\nServer ID: ${this.config.SERVER_ID}`);
-            console.log(`DEBUG - Welcome channel ID: ${this.config.WELCOME_CHANNEL_ID}\nDEBUG - Streaming channel ID: ${this.config.STREAMING_CHANNEL_ID}\nDEBUG - Server ID: ${this.config.SERVER_ID}`);
+            console.log(`\nDEBUG - Streaming channel ID: ${this.config.STREAMING_CHANNEL_ID}\nDEBUG - Server ID: ${this.config.SERVER_ID}`);
             this.client.setTimeout(() => {
                 // Check for live every 60 seconds thereafter
                 this.client.setInterval(async () => {

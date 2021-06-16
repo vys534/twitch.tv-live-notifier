@@ -9,17 +9,17 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/humanize-duration": "^3.18.0",
-    "@types/node": "^13.9.5",
-    "@types/ws": "^7.2.3",
+    "@discordjs/voice": "^0.5.0",
+    "@types/humanize-duration": "^3.25.0",
+    "@types/node": "^15.12.2",
+    "@types/ws": "^7.4.4",
     "axios": "^0.21.1",
     "discord.js": "github:discordjs/discord.js",
-    "envalid": "^6.0.1",
-    "humanize-duration": "^3.22.0",
-    "moment": "^2.24.0",
-    "npm": "^7.6.3"
+    "envalid": "^7.1.0",
+    "humanize-duration": "^3.27.0",
+    "moment": "^2.29.1"
   },
   "devDependencies": {
-    "typescript": "^4.2.3"
+    "typescript": "^4.3.2"
   }
 }
