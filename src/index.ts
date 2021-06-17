@@ -7,7 +7,7 @@ import hd from "humanize-duration";
 import m from "moment";
 
 const bigIntParse = envalid.makeValidator(x => {
-    return <bigint><unknown>x;
+    return BigInt(x);
 })
 
 interface StreamData {
@@ -152,7 +152,7 @@ class Application {
         }
     }
 
-    private buildStreamEmbed(streamOver?: boolean): object {
+    private buildStreamEmbed(streamOver?: boolean): MessageEmbedOptions {
         let desc: string;
         if (streamOver) {
             desc = `Last seen playing: **${this.streamData.playing || "Was not playing a game"}**\nPeak viewers: **${this.streamData.peakViewers.toLocaleString()}**`
@@ -160,7 +160,7 @@ class Application {
             desc = `Playing: **${this.streamData.playing || "Not playing a game"}**\nViewers: **${this.streamData.viewers.toLocaleString()}** [Peak: **${this.streamData.peakViewers.toLocaleString()}**]`
         }
         desc += `\nStream language: **${this.streamData.language}**`;
-        const embedObject: MessageEmbedOptions = {
+        return {
             title: `**${this.streamData.title}**`,
             url: `https://twitch.tv/${this.config.TWITCH_USERNAME}`,
             description: desc,
@@ -169,9 +169,6 @@ class Application {
                 text: `Stream ${streamOver ? "was" : "has been"} up for: ${hd(m().unix() * 1000 - m(this.streamData.durationString).unix() * 1000, {largest: 2})}`
             }
         };
-        return {
-            embed: embedObject
-        }
     }
 
     // private async updateUserData() {
@@ -226,7 +223,7 @@ class Application {
             // We got no data back, so assume the streamer isn't streaming.
             if (!twitchData) {
                 // Assume stream ended.
-                if (this.streamData.isStreaming) {
+                if (this.streamData.isStreaming && this.streamData.streamMessage !== null) {
                     console.log("DEBUG - Stream ended. Cleaning up message...");
                     await this.streamData.streamMessage.edit({
                         content: `:no_entry_sign: ${this.streamData.username} has ended the stream. Tune in next time!`,
@@ -246,7 +243,7 @@ class Application {
                 // Update displayed stream data (in the embed, etc).
                 await this.updateStatistics(twitchData);
                 // Just update the message because they're still streaming
-                if (this.streamData.isStreaming) {
+                if (this.streamData.isStreaming && this.streamData.streamMessage !== null) {
                     await this.streamData.streamMessage.edit({
                         content: `:red_circle: ${this.streamData.username} is currently streaming${this.streamData.playing ? ` **${this.streamData.playing}**` : ""}!`,
                         embeds: [
@@ -293,10 +290,10 @@ class Application {
             // console.log(`Tracking Twitch user ${this.userData.loginName}.\nDisplay name: ${this.userData.displayName}\nWelcome channel ID: ${this.config.WELCOME_CHANNEL_ID}\nStreaming channel ID: ${this.config.STREAMING_CHANNEL_ID}\nServer ID: ${this.config.SERVER_ID}`);
             console.log(`\nDEBUG - Streaming channel ID: ${this.config.STREAMING_CHANNEL_ID}\nDEBUG - Server ID: ${this.config.SERVER_ID}`);
             this.client.setTimeout(() => {
-                // Check for live every 60 seconds thereafter
+                // Check for live every 30 seconds thereafter
                 this.client.setInterval(async () => {
                     await this.monitorForLiveStatus();
-                }, 60000);
+                }, 30000);
             }, 10000);
         });
     }
